@@ -1,23 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 
-// ─── CONFIGURATION ────────────────────────────────────────────────────────────
-// 1. Go to https://console.cloud.google.com/
-// 2. Create a project → Enable "Google Drive API" + "Google Picker API"
-// 3. Create OAuth 2.0 credentials (Web application)
-//    - Authorized JS origins: http://localhost:3000
-// 4. Create an API Key (restrict to Drive + Picker APIs)
-// 5. Create a file at the project root named .env and add:
-//    VITE_GOOGLE_CLIENT_ID=your-client-id
-//    VITE_GOOGLE_API_KEY=your-api-key
-// 6. Restart the Vite dev server after updating .env.
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 const HAS_GOOGLE_CONFIG = Boolean(CLIENT_ID && API_KEY);
 const SCOPES = "https://www.googleapis.com/auth/drive.file";
 const FOLDER_NAME = "My Notes";
 
-// ─── DOCX BUILDER (pure browser, no backend) ─────────────────────────────────
-// Uses docx.js loaded via CDN in index.html (see README at bottom)
 function buildDocx(title, rawText) {
   const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } =
     window.docx;
@@ -77,10 +65,7 @@ async function appendToExistingDoc(fileId, newTitle, rawText, accessToken) {
   );
   const existingBuffer = await dlRes.arrayBuffer();
 
-  // We can't truly "merge" two docx files in pure browser JS,
-  // so we append as a clearly-marked new section using mammoth to extract text
-  // then rebuild the whole doc.
-  // For simplicity: download existing text, append new content.
+
   const mammoth = window.mammoth;
   const { value: existingText } = await mammoth.extractRawText({
     arrayBuffer: existingBuffer,
